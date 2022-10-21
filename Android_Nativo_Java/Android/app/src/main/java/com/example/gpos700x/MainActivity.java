@@ -10,21 +10,19 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-
 import com.example.gpos700x.ExemploCodigoBarras1.CodigoBarras1;
 import com.example.gpos700x.ExemploCodigoBarras2.CodigoBarras2;
 import com.example.gpos700x.ExemploImpressora.Impressora;
 import com.example.gpos700x.ExemploNFCGedi.NfcExemploGedi;
 import com.example.gpos700x.ExemploNFCId.NfcExemploId;
 import com.example.gpos700x.ExemploNFCIdRW.NfcExemplo;
-import com.example.gpos700x.ExemploSAT.SatPages.MenuSat;
 import com.example.gpos700x.ExemploTEF.Tef;
 
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static final String G700 = "GPOS700";
+    public static final String G700 = "GPOS700x";
     private static final String version = "v1.0.0";
 
     public static String Model = Build.MODEL;
@@ -39,10 +37,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        txtProject = findViewById(R.id.txtNameProject);
         lvProjetos = findViewById(R.id.lvProjetos);
-
-        txtProject.setText("Android Studio "+ version);
 
         projetos.add(new Projeto("Código de Barras", R.drawable.barcode));
         projetos.add(new Projeto("Código de Barras V2",R.drawable.qr_code));
@@ -58,7 +53,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         projetos.add(new Projeto("TEF", R.drawable.tef));
-        projetos.add(new Projeto("SAT", R.drawable.icon_sat));
 
         ProjetoAdapter adapter = new ProjetoAdapter(getBaseContext(), R.layout.listprojetos, projetos);
         lvProjetos.setAdapter(adapter);
@@ -96,9 +90,6 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case "TEF":
                         intent = new Intent(MainActivity.this, Tef.class);
-                        break;
-                    case "SAT":
-                        intent = new Intent(MainActivity.this, MenuSat.class);
                         break;
                 }
                 if(intent != null){

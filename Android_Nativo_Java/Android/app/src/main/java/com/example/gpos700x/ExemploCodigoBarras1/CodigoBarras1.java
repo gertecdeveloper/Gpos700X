@@ -1,6 +1,5 @@
 package com.example.gpos700x.ExemploCodigoBarras1;
 
-import static android.hardware.Camera.Parameters.FLASH_MODE_ON;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -89,7 +88,6 @@ public class CodigoBarras1 extends Activity implements View.OnClickListener {
         qrScan.setBeepEnabled(true);
         qrScan.setBarcodeImageEnabled(true);
         qrScan.setTimeout(30000); // 30 * 1000 => 3 minuto
-        qrScan.addExtra("FLASH_MODE_ON", FLASH_MODE_ON);
         qrScan.initiateScan(this.arrayListTipo);
     }
 

@@ -1,96 +1,179 @@
 package com.example.gpos700x.ExemploImpressora;
 
-import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.os.Build;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.RadioButton;
-import android.widget.Spinner;
-import android.widget.TextView;
-import android.widget.Toast;
-import android.widget.ToggleButton;
+import android.widget.EditText;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.gpos700x.MainActivity;
 import com.example.gpos700x.R;
 
+import br.com.gertec.gedi.GEDI;
+import br.com.gertec.gedi.enums.GEDI_PRNTR_e_BarCodeType;
 import br.com.gertec.gedi.enums.GEDI_PRNTR_e_Status;
 import br.com.gertec.gedi.exceptions.GediException;
 import br.com.gertec.gedi.interfaces.IGEDI;
 import br.com.gertec.gedi.interfaces.IPRNTR;
+import br.com.gertec.gedi.structs.GEDI_PRNTR_st_BarCodeConfig;
 
-public class Impressora extends AppCompatActivity implements View.OnClickListener {
+public class Impressora extends AppCompatActivity {
 
-    private GertecPrinter gertecPrinter;
+    private EditText txtMensagemImpressao;
 
-    private TextView txtMensagemImpressao;
-
-    private Button btnStatusImpressora;
-    private Button btnImprimir;
-    private Button btnImagem;
-    private Button btnBarCode;
-    private Button btnTodasAsFuncoes;
-
-    private RadioButton rbEsquerda;
-    private RadioButton rbCentralizado;
-    private RadioButton rbDireita;
-
-    private ToggleButton btnNegrito;
-    private ToggleButton btnItalico;
-    private ToggleButton btnSublinhado;
-
-    private Spinner spFonte;
-    private Spinner spTamanho;
-    private Spinner spHeight;
-    private Spinner spWidth;
-    private Spinner spBarCode;
+    private Button btnStatusImpressora, btnImagem, btnBarCode, btnImprimir;
 
     private IGEDI iGedi = null;
     private IPRNTR iPrint = null;
     private GEDI_PRNTR_e_Status status;
 
-    private ConfigPrint configPrint = new ConfigPrint();
+
+    IPRNTR iprntr;
+
+    GEDI_PRNTR_e_Status prntrStatus;
+
+    int prntrUsage;
+    String gediVersion;
+    GEDI_PRNTR_e_BarCodeType GEDI_PRNTR_e_BarCodeType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.impressora);
 
-        // Inicializa os componentes de Texto
-        iniTextView();
+        GEDI.init(this);
 
-        // Inicializa os RadioButtons
-        iniRbButton();
+        new Thread(() -> {
+            iGedi = GEDI.getInstance(Impressora.this);
+        }).start();
 
-        // Inicializa os Spinner
-        iniSpinner();
+        btnStatusImpressora = findViewById(R.id.btnStatusImpressora);
+        btnImprimir = findViewById(R.id.btnImprimir);
+        btnImagem = findViewById(R.id.btnImagem);
+        btnBarCode = findViewById(R.id.btnBarCode);
 
-        // Inicializa os Buttons
-        initButtons();
 
-        // Atribui as funções aos buttons
-        initButtonsOnClick();
 
-        // Inicializa a class de impressão
-        if(MainActivity.Model.equals(MainActivity.G700)){
-            gertecPrinter = new GertecPrinter(this.getApplicationContext());
-        }else{
-            // gertecPrinter = new GertecPrinter(this);
-        }
+        btnStatusImpressora.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                iprntr = iGedi.getPRNTR();
+                String GEDI_PRNTR_e_Status = null;
+                try {
 
-        gertecPrinter.setConfigImpressao(configPrint);
 
+                    GEDI_PRNTR_e_Status = String.valueOf(iprntr.Status());
+
+                    Log.v("status", GEDI_PRNTR_e_Status);
+
+                    showMessagem("Status Impressora", GEDI_PRNTR_e_Status);
+                } catch (GediException e) {
+                    e.printStackTrace();
+                }
+                Log.d("Gertec: ", "Printer Status = " + GEDI_PRNTR_e_Status + " Paper Usage = " + GEDI_PRNTR_e_Status);
+            }
+        });
+
+        btnImagem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                try {
+
+                    iprntr = iGedi.getPRNTR();
+
+                    iprntr.Init();
+
+                    tPRNTR.DrawPicture(Impressora.this, iprntr, "CENTER", 0, 300, 400, "gertec");
+
+                    iprntr.DrawBlankLine(50);
+                    iprntr.Output();
+
+                    Log.v("certo", "Ocorreu tudo certo");
+
+                } catch (GediException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        btnImprimir.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+
+                try {
+
+                    txtMensagemImpressao = findViewById(R.id.txtMensagemImpressao);
+
+                    iprntr = iGedi.getPRNTR();
+
+                    String GEDI_PRNTR_e_Status = String.valueOf(iprntr.Status());
+
+                    Log.v("status", GEDI_PRNTR_e_Status);
+
+
+                        tPRNTR.DrawString(Impressora.this, iprntr, "CENTER", 20, 20,
+                                "NORMAL", true, false, false, 20, txtMensagemImpressao.getText().toString());
+
+                    iprntr.DrawBlankLine(50);
+
+                } catch (GediException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
+
+        btnBarCode.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                try{
+
+                    iprntr = iGedi.getPRNTR();
+
+
+                    iprntr.Init();
+                    iprntr.DrawBarCode(new GEDI_PRNTR_st_BarCodeConfig(br.com.gertec.gedi.enums.GEDI_PRNTR_e_BarCodeType.QR_CODE, 300, 100), "Gertec");
+                    iprntr.DrawBlankLine(50);
+                    iprntr.Output();
+
+                } catch (GediException e){
+                    e.printStackTrace();
+                }
+            }
+        });
+
+
+
+
+    }
+
+
+    protected void showMessagem(String titulo, String mensagem){
+        AlertDialog alertDialog = new AlertDialog.Builder(Impressora.this).create();
+        alertDialog.setTitle(titulo);
+        alertDialog.setMessage(mensagem);
+        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        alertDialog.show();
     }
 
     void ShowFalha(String sStatus){
         showMessagem("Falha Impressor",sStatus);
     }
 
-    @Override
+    /*@Override
     public void onClick(View view) {
 
         switch (view.getId()){
@@ -167,257 +250,5 @@ public class Impressora extends AppCompatActivity implements View.OnClickListene
                 ImprimeTodasAsFucoes();
 
         }
-    }
-
-    protected void iniRbButton(){
-        rbEsquerda = findViewById(R.id.rbEsquerda);
-        rbCentralizado = findViewById(R.id.rbCentralizado);
-        rbDireita = findViewById(R.id.rbDireita);
-    }
-
-    protected void iniTextView(){
-        txtMensagemImpressao = findViewById(R.id.txtMensagemImpressao);
-    }
-
-    protected void initButtons(){
-
-        btnStatusImpressora = findViewById(R.id.btnStatusImpressora);
-
-        btnImprimir = findViewById(R.id.btnImprimir);
-
-        btnImagem = findViewById(R.id.btnImagem);
-
-        btnNegrito = findViewById(R.id.btnNegrito);
-        btnItalico = findViewById(R.id.btnItalico);
-        btnSublinhado = findViewById(R.id.btnSublinhado);
-
-        btnBarCode = findViewById(R.id.btnBarCode);
-
-        btnTodasAsFuncoes = findViewById(R.id.btnTodasAsFuncoes);
-    }
-
-    protected void initButtonsOnClick(){
-        btnStatusImpressora.setOnClickListener(this);
-        btnImprimir.setOnClickListener(this);
-        btnImagem.setOnClickListener(this);
-        btnBarCode.setOnClickListener(this);
-        btnTodasAsFuncoes.setOnClickListener(this);
-
-    }
-
-    protected void iniSpinner(){
-        spFonte = findViewById(R.id.spFont);
-        spTamanho = findViewById(R.id.spTamanho);
-
-        spHeight = findViewById(R.id.spHeight);
-        spWidth = findViewById(R.id.spWidth);
-        spBarCode = findViewById(R.id.spBarType);
-
-    }
-
-    @TargetApi(Build.VERSION_CODES.O)
-    protected void imprimir() throws Exception {
-
-        // Configura o alinhamento da impressão
-        if (rbEsquerda.isChecked()){
-            configPrint.setAlinhamento("LEFT");
-        }else if(rbCentralizado.isChecked()){
-            configPrint.setAlinhamento("CENTER");
-        }else if(rbDireita.isChecked()){
-            configPrint.setAlinhamento("RIGHT");
-        }
-
-        // Configura o tipo de impressão
-        configPrint.setNegrito(btnNegrito.isChecked());
-        configPrint.setItalico(btnItalico.isChecked());
-        configPrint.setSublinhado(btnSublinhado.isChecked());
-
-        // Configura a fonte a ser impresa
-        configPrint.setFonte(spFonte.getSelectedItem().toString());
-
-        // Configra o tamanho da fonte
-        configPrint.setTamanho(Integer.parseInt(spTamanho.getSelectedItem().toString()));
-
-        // Aplica as novas configurações
-        gertecPrinter.setConfigImpressao(configPrint);
-
-        // Faz a impressão
-        String sStatus = gertecPrinter.getStatusImpressora();
-        if(gertecPrinter.isImpressoraOK()) {
-            gertecPrinter.imprimeTexto(txtMensagemImpressao.getText().toString());
-            // Usado apenas no exemplo, esse pratica não deve
-            // ser repetida na impressão em produção
-            gertecPrinter.avancaLinha(150);
-            gertecPrinter.ImpressoraOutput();
-        }else{
-            ShowFalha(sStatus);
-        }
-
-
-
-    }
-
-    protected void showMessagem(String titulo, String mensagem){
-        AlertDialog alertDialog = new AlertDialog.Builder(Impressora.this).create();
-        alertDialog.setTitle(titulo);
-        alertDialog.setMessage(mensagem);
-        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-        alertDialog.show();
-    }
-
-
-    private void ImprimeTodasAsFucoes(){
-        configPrint.setItalico(false);
-        configPrint.setNegrito(true);
-        configPrint.setTamanho(20);
-        configPrint.setFonte("MONOSPACE");
-        gertecPrinter.setConfigImpressao(configPrint);
-
-        try {
-            gertecPrinter.getStatusImpressora();
-            // Imprimindo Imagem
-            configPrint.setiWidth(300);
-            configPrint.setiHeight(130);
-            configPrint.setAlinhamento("CENTER");
-            gertecPrinter.setConfigImpressao(configPrint);
-            gertecPrinter.imprimeTexto("==[Iniciando Impressao Imagem]==");
-            gertecPrinter.imprimeImagem("gertec_2");
-            gertecPrinter.avancaLinha(10);
-            gertecPrinter.imprimeTexto("====[Fim Impressão Imagem]====");
-            gertecPrinter.avancaLinha(10);
-            // Fim Imagem
-
-            // Impressão Centralizada
-            configPrint.setAlinhamento("CENTER");
-            configPrint.setTamanho(30);
-            gertecPrinter.setConfigImpressao(configPrint);
-            gertecPrinter.imprimeTexto("CENTRALIZADO");
-            gertecPrinter.avancaLinha(10);
-            // Fim Impressão Centralizada
-
-            // Impressão Esquerda
-            configPrint.setAlinhamento("LEFT");
-            configPrint.setTamanho(40);
-            gertecPrinter.setConfigImpressao(configPrint);
-            gertecPrinter.imprimeTexto("ESQUERDA");
-            gertecPrinter.avancaLinha(10);
-            // Fim Impressão Esquerda
-
-            // Impressão Direita
-            configPrint.setAlinhamento("RIGHT");
-            configPrint.setTamanho(20);
-            gertecPrinter.setConfigImpressao(configPrint);
-            gertecPrinter.imprimeTexto("DIREITA");
-            gertecPrinter.avancaLinha(10);
-            // Fim Impressão Direita
-
-            // Impressão Negrito
-            configPrint.setNegrito(true);
-            configPrint.setAlinhamento("LEFT");
-            configPrint.setTamanho(20);
-            gertecPrinter.setConfigImpressao(configPrint);
-            gertecPrinter.imprimeTexto("=======[Escrita Netrigo]=======");
-            gertecPrinter.avancaLinha(10);
-            // Fim Impressão Negrito
-
-            // Impressão Italico
-            configPrint.setNegrito(false);
-            configPrint.setItalico(true);
-            configPrint.setAlinhamento("LEFT");
-            configPrint.setTamanho(20);
-            gertecPrinter.setConfigImpressao(configPrint);
-            gertecPrinter.imprimeTexto("=======[Escrita Italico]=======");
-            gertecPrinter.avancaLinha(10);
-            // Fim Impressão Italico
-
-            // Impressão Italico
-            configPrint.setNegrito(false);
-            configPrint.setItalico(false);
-            configPrint.setSublinhado(true);
-            configPrint.setAlinhamento("LEFT");
-            configPrint.setTamanho(20);
-            gertecPrinter.setConfigImpressao(configPrint);
-            gertecPrinter.imprimeTexto("======[Escrita Sublinhado]=====");
-            gertecPrinter.avancaLinha(10);
-            // Fim Impressão Italico
-
-            // Impressão BarCode 128
-            configPrint.setNegrito(false);
-            configPrint.setItalico(false);
-            configPrint.setSublinhado(false);
-            configPrint.setAlinhamento("CENTER");
-            configPrint.setTamanho(20);
-            gertecPrinter.setConfigImpressao(configPrint);
-            gertecPrinter.imprimeTexto("====[Codigo Barras CODE 128]====");
-            gertecPrinter.imprimeBarCode("12345678901234567890", 120,120,"CODE_128");
-            gertecPrinter.avancaLinha(10);
-            // Fim Impressão BarCode 128
-
-            // Impressão Normal
-            configPrint.setNegrito(false);
-            configPrint.setItalico(false);
-            configPrint.setSublinhado(true);
-            configPrint.setAlinhamento("LEFT");
-            configPrint.setTamanho(20);
-            gertecPrinter.setConfigImpressao(configPrint);
-            gertecPrinter.imprimeTexto("=======[Escrita Normal]=======");
-            gertecPrinter.avancaLinha(10);
-            // Fim Impressão Normal
-
-            // Impressão Normal
-            configPrint.setNegrito(false);
-            configPrint.setItalico(false);
-            configPrint.setSublinhado(true);
-            configPrint.setAlinhamento("LEFT");
-            configPrint.setTamanho(20);
-            gertecPrinter.setConfigImpressao(configPrint);
-            gertecPrinter.imprimeTexto("=========[BlankLine 50]=========");
-            gertecPrinter.avancaLinha(50);
-            gertecPrinter.imprimeTexto("=======[Fim BlankLine 50]=======");
-            gertecPrinter.avancaLinha(10);
-            // Fim Impressão Normal
-
-            // Impressão BarCode 13
-            configPrint.setNegrito(false);
-            configPrint.setItalico(false);
-            configPrint.setSublinhado(false);
-            configPrint.setAlinhamento("CENTER");
-            configPrint.setTamanho(20);
-            gertecPrinter.setConfigImpressao(configPrint);
-            gertecPrinter.imprimeTexto("=====[Codigo Barras EAN13]=====");
-            gertecPrinter.imprimeBarCode("7891234567895", 120,120,"EAN_13");
-            gertecPrinter.avancaLinha(10);
-            // Fim Impressão BarCode 128
-
-            // Impressão BarCode 13
-            gertecPrinter.setConfigImpressao(configPrint);
-            gertecPrinter.imprimeTexto("===[Codigo QrCode Gertec LIB]==");
-            gertecPrinter.avancaLinha(10);
-            gertecPrinter.imprimeBarCode("Gertec Developer Partner LIB", 240,240,"QR_CODE");
-
-            configPrint.setNegrito(false);
-            configPrint.setItalico(false);
-            configPrint.setSublinhado(false);
-            configPrint.setAlinhamento("CENTER");
-            configPrint.setTamanho(20);
-            gertecPrinter.imprimeTexto("===[Codigo QrCode Gertec IMG]==");
-            gertecPrinter.imprimeBarCodeIMG("Gertec Developer Partner IMG", 240,240,"QR_CODE");
-
-            gertecPrinter.avancaLinha(100);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }finally {
-            try {
-                gertecPrinter.ImpressoraOutput();
-            } catch (GediException e) {
-                e.printStackTrace();
-            }
-        }
-    }
+    }*/
 }

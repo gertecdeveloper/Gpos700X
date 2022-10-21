@@ -17,8 +17,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.gpos700x.ExemploImpressora.ConfigPrint;
-import com.example.gpos700x.ExemploImpressora.GertecPrinter;
+import com.example.gpos700x.ExemploImpressora.Impressora;
+import com.example.gpos700x.ExemploImpressora.tPRNTR;
 import com.example.gpos700x.R;
 import com.google.gson.Gson;
 
@@ -31,6 +31,11 @@ import java.util.Locale;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import br.com.gertec.gedi.enums.GEDI_PRNTR_e_Status;
+import br.com.gertec.gedi.exceptions.GediException;
+import br.com.gertec.gedi.interfaces.IGEDI;
+import br.com.gertec.gedi.interfaces.IPRNTR;
 
 public class Tef extends AppCompatActivity {
     private final String GER7_API_VERSION = "1.04";
@@ -57,9 +62,14 @@ public class Tef extends AppCompatActivity {
 
     Venda venda = new Venda();
 
+    private IGEDI iGedi = null;
+    private IPRNTR iPrint = null;
+    private GEDI_PRNTR_e_Status status;
 
-    private GertecPrinter gertecPrinter;
-    private ConfigPrint configPrint = new ConfigPrint();
+
+
+    IPRNTR iprntr;
+
     /// Difines operação
     private Random r = new Random();
     private Date dt = new Date();
@@ -94,6 +104,7 @@ public class Tef extends AppCompatActivity {
     private RadioButton rbLoja;
     private RadioButton rbAdm;
     private RadioButton rbMsitef;
+    private String GEDI_PRNTR_e_Status;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -133,7 +144,6 @@ public class Tef extends AppCompatActivity {
         txtValorOperacao.setHint("");
         txtValorOperacao.setText("1000");
         txtIpServidor.setText("");
-        gertecPrinter = new GertecPrinter(this);
         rbMsitef.setChecked(true);
         rbAdm.setChecked(true);
         cbImpressao.setChecked(true);
@@ -486,9 +496,9 @@ public class Tef extends AppCompatActivity {
 
                     try {
                         if (curPos != LastPos) {
-                            gertecPrinter.imprimeTexto(CupomTEF.substring(LastPos, curPos));
+                            tPRNTR.DrawString(Tef.this, iprntr, "CENTER", 10, 300, "NORMAL", true, false, false, 30,CupomTEF.substring(LastPos, curPos));
                         } else {
-                            gertecPrinter.imprimeTexto(" ");
+                            tPRNTR.DrawString(Tef.this, iprntr, "CENTER", 10, 300, "NORMAL",true, false, false, 30, "     ");
                         }
                         curPos++;
                         LastPos = curPos;
@@ -515,35 +525,20 @@ public class Tef extends AppCompatActivity {
                 String textoEstabelecimento = "";
                 String textoCliente = "";
 
-                configPrint.setAlinhamento("LEFT");
-                configPrint.setFonte("MONOSPACE");
-                configPrint.setTamanho(size);
-                configPrint.setNegrito(true);
-                configPrint.setItalico(false);
-                configPrint.setSublinhado(false);
-                try {
-                    gertecPrinter.getStatusImpressora();
-                    if (gertecPrinter.isImpressoraOK()) {
-                        gertecPrinter.setConfigImpressao(configPrint);
-                        if (rbGer7.isChecked()) {
 
-                            textoEstabelecimento = texto.substring(0, texto.indexOf("\f"));
-                            textoCliente = texto.substring(texto.indexOf("\f"));
+                textoEstabelecimento = texto.substring(0, texto.indexOf("\f"));
+                textoCliente = texto.substring(texto.indexOf("\f"));
 
-                            ImprimaGer7(textoEstabelecimento);
-                            gertecPrinter.avancaLinha(100);
-                            ImprimaGer7(textoCliente);
-                        } else {
-                            gertecPrinter.imprimeTexto(texto);
-                        }
-                        gertecPrinter.avancaLinha(150);
-                    }
-                    gertecPrinter.ImpressoraOutput();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                tPRNTR.DrawString(Tef.this, iprntr, "LEFT", 10, 300, "MONOSPACE", true, false, false, size, textoEstabelecimento);
+
+                tPRNTR.DrawString(Tef.this, iprntr, "LEFT", 10, 300, "MONOSPACE", true, false, false, size, textoCliente);
+
+
+                tPRNTR.DrawString(Tef.this, iprntr, "LEFT", 10, 300, "MONOSPACE", true, false, false, size, texto);
+
 
             }
+
 
         });
         alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Não", new DialogInterface.OnClickListener() {

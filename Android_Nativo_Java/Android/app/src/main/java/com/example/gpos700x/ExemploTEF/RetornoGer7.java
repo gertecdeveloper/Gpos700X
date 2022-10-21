@@ -1,7 +1,5 @@
 package com.example.gpos700x.ExemploTEF;
 
-import static java.lang.Integer.parseInt;
-
 public class RetornoGer7 {
 
     private String version;

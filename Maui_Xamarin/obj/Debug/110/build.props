@@ -1,0 +1,34 @@
+bundleassemblies=false
+aotassemblies=false
+androidaddkeepalives=
+androidaotmode=none
+androidembedprofilers=
+androidenableprofiledaot=
+androiddextool=d8
+androidlinktool=
+androidlinkresources=
+androidpackageformat=apk
+embedassembliesintoapk=false
+androidlinkmode=none
+androidlinkskip=
+androidsdkbuildtoolsversion=30.0.2
+androidsdkpath=c:\program files (x86)\android\android-sdk\
+androidndkpath=
+javasdkpath=c:\program files\eclipse foundation\jdk-8.0.302.8-hotspot\
+androidsequencepointsmode=none
+xamarinandroidversion=12.0.0-3
+monosymbolarchive=false
+androiduselatestplatformsdk=false
+targetframeworkversion=v11.0
+androidcreatepackageperabi=
+androidgeneratejnimarshalmethods=false
+os=windows_nt
+androidincludedebugsymbols=true
+androidpackagenamingpolicy=lowercasecrc64
+_nugetassetstimestamp=638018780279102821
+typemapkind=strings-asm
+androidsupportedabis=arm64-v8a
+armeabi-v7a
+x86
+x86_64
+androidmanifestplaceholders=

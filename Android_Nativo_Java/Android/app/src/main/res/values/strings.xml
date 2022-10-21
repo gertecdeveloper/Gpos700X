@@ -1,4 +1,5 @@
 <resources>
+
     <string name="app_name">GertecOne FrameWork</string>
 
     <string name="aproxime_o_cart_o_da_leitora">Aproxime o cartão da leitora.</string>
@@ -20,7 +21,7 @@
 
     <string name="bar_code_width">Bar Code Width</string>
     <string name="bar_code_height">Bar Code Height</string>
-    <string name="fun_es_impressora_gpos800">Funções Impressao G700/G800</string>
+    <string name="fun_es_impressora_gpos800">Funções Impressao Gpos700x</string>
     <string name="status_impressora">Status Impressora</string>
     <string name="escreva_a_sua_mensagem">Escreva a sua mensagem</string>
     <string name="configura_o_de_impress_o">Configuração de impressão</string>
@@ -34,7 +35,7 @@
     <string name="imprimir">Imprimir Texto</string>
     <string name="imprimir_imagem">Imprimir imagem</string>
     <string name="barcodes">BarCodes</string>
-    <string name="imprimir_barcode">Imprimir BarCode</string>
+    <string name="imprimir_barcode">Imprimir QrCode</string>
     <string name="imprimir_todasasfuncoes">Imprimir Todas Funções</string>
     <string name="font">Font:</string>
 
@@ -80,5 +81,4 @@
         <item>PDF_417</item>
 
     </string-array>
-
 </resources>
