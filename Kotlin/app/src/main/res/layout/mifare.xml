@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".MainActivity">
+
+
+    <TextView
+        android:id="@+id/authenticationInfo"
+        android:layout_width="175dp"
+        android:layout_height="30dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:background="#FFD1A0"
+        android:gravity="center_vertical|right"
+        android:text="AUTHENTICATION (KEY A) >> "
+        android:textColor="#454545"
+        android:textSize="12sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/authenticationKeyText"
+        android:layout_width="165dp"
+        android:layout_height="30dp"
+        android:background="#F8E5D0"
+        android:editable="true"
+        android:focusableInTouchMode="true"
+        android:text="FFFFFFFFFFFF"
+        android:textAlignment="center"
+        android:textColor="#000000"
+        android:textSize="18sp"
+        app:layout_constraintLeft_toRightOf="@+id/authenticationInfo"
+        app:layout_constraintTop_toTopOf="@+id/authenticationInfo" />
+
+
+    <Button
+        android:id="@+id/readBlockBtn"
+        android:layout_width="160dp"
+        android:layout_height="50dp"
+        android:layout_marginBottom="50dp"
+        android:layout_marginEnd="125dp"
+        android:background="#F4805B"
+        android:onClick="onReadBlocks"
+        android:text="READ BLOCKS"
+        android:textSize="10sp"
+        app:layout_constraintBottom_toTopOf="@+id/SCROLLER_ID"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/readBlocksText"
+        android:layout_width="35dp"
+        android:layout_height="50dp"
+        android:background="#FBB29B"
+        android:editable="true"
+        android:focusableInTouchMode="true"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="8"
+        android:textColor="#000000"
+        android:textSize="14sp"
+        app:layout_constraintLeft_toRightOf="@+id/readBlockBtn"
+        app:layout_constraintTop_toTopOf="@+id/readBlockBtn" />
+
+    <ScrollView
+        android:id="@+id/SCROLLER_ID"
+        android:layout_width="400dp"
+        android:layout_height="400dp"
+        android:scrollbars="vertical"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <TextView
+            android:id="@+id/outputView"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:background="#DDDDDD"
+            android:scrollbars="vertical"
+            android:textSize="14sp" />
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

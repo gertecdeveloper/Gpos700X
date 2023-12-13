@@ -1,0 +1,8 @@
+signingConfigs {
+        gertec {
+            storeFile file('..\\..\\Chaves\\Development_GertecDeveloper_CustomerAPP.jks')
+            storePassword 'Development@GertecDeveloper2018'
+            keyAlias 'developmentgertecdeveloper_customerapp'
+            keyPassword 'Development@GertecDeveloper2018'
+        }
+    }
